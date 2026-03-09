@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Premiere Tache depuis JSON",
+        "desc": "Ceci est la description de la premiere tache generee par mon application python automatique."
+    },
+    {
+        "name": "Deuxieme Tache a faire",
+        "desc": "Description detaillee 2."
+    },
+    {
+        "name": "Design du logo",
+        "desc": "Verifier que le logo apparait bien dans l'interface Tkinter."
+    }
+]
