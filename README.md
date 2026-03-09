@@ -67,22 +67,36 @@ Vous aurez besoin de générer vos clés d'API Trello (c'est entièrement gratui
 
 ## 📄 Format du JSON Attendu
 
-Votre fichier doit être un tableau (liste) structuré contenant des objets JSON. Chaque objet représente une carte.
+Votre fichier peut avoir deux formats différents :
+- **Une simple liste** (tableau d'objets) de cartes.
+- **Un projet complexe** encapsulant les cartes dans un attribut `tasks`.
 
-Exemple (que vous retrouverez dans le fichier `exemple.json`) :
+L'application supporte les clés `name` ou `title` pour le titre, et `desc` ou `description` pour le texte. De plus, vous pouvez générer automatiquement une **Checklist** en passant un tableau de chaînes à la clé `checklist`.
+
+Exemple :
 ```json
-[
+{
+  "project": {
+    "name": "Dashboard Streamlit",
+    "description": "Création d'un dashboard interactif."
+  },
+  "tasks": [
     {
-        "name": "Tâche numéro 1",
-        "desc": "Ceci est la description complète de la première tâche."
+      "title": "Connexion à PostgreSQL",
+      "description": "Se connecter à la base de données et vérifier les données.",
+      "checklist": [
+        "Installer sqlalchemy et psycopg2",
+        "Tester connexion PostgreSQL"
+      ]
     },
     {
-        "name": "Design du logo",
-        "desc": "Vérifier que le logo apparaît bien dans l'interface Tkinter."
+      "title": "Création visualisations",
+      "description": "Créer graphiques avec seaborn et matplotlib."
     }
-]
+  ]
+}
 ```
-> **Note :** La clé `"name"` est le titre de la carte, `"desc"` est la description détaillée.
+> **Note :** Les éléments dans `checklist` s'ajouteront automatiquement sous forme de cases à cocher dans votre carte Trello !
 
 ---
 
