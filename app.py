@@ -56,15 +56,35 @@ def get_list_id(board_url, api_key, token):
 
 def create_card(list_id, card_data, api_key, token):
     url = "https://api.trello.com/1/cards"
+    
+    # Support pour "name" ou "title" (titre) et "desc" ou "description" (description)
+    name = card_data.get("name", card_data.get("title", "Sans nom"))
+    desc = card_data.get("desc", card_data.get("description", ""))
+    
     query = {
         "idList": list_id,
         "key": api_key,
         "token": token,
-        "name": card_data.get("name", "Sans nom"),
-        "desc": card_data.get("desc", "")
+        "name": name,
+        "desc": desc
     }
     response = requests.post(url, params=query)
     response.raise_for_status()
+    
+    card_id = response.json().get('id')
+    checklist_data = card_data.get("checklist")
+    
+    # Si la carte contient une checklist, on la crée
+    if card_id and checklist_data and isinstance(checklist_data, list):
+        cl_url = f"https://api.trello.com/1/cards/{card_id}/checklists"
+        cl_response = requests.post(cl_url, params={"key": api_key, "token": token, "name": "Checklist"})
+        
+        if cl_response.status_code == 200:
+            checklist_id = cl_response.json().get('id')
+            # Ajout des éléments de la checklist
+            for item in checklist_data:
+                item_url = f"https://api.trello.com/1/checklists/{checklist_id}/checkItems"
+                requests.post(item_url, params={"key": api_key, "token": token, "name": str(item)})
 
 
 class TrelloApp(ctk.CTk):
@@ -200,8 +220,12 @@ class TrelloApp(ctk.CTk):
             with open(json_file, 'r', encoding='utf-8') as f:
                 cards = json.load(f)
                 
+            # Si le JSON est un dictionnaire contenant une clé "tasks"
+            if isinstance(cards, dict) and "tasks" in cards:
+                cards = cards["tasks"]
+                
             if not isinstance(cards, list):
-                raise ValueError("Format JSON invalide : doit être une liste d'objets (cartes).")
+                raise ValueError("Format JSON invalide : doit être une liste d'objets (cartes) ou un objet contenant une clé 'tasks'.")
                 
             for index, card in enumerate(cards, start=1):
                 self.status_label.configure(text=f"⏳ Création de la carte {index}/{len(cards)}...")
